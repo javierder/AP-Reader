@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Artepolitica.com m&oacute;vil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container">
+      <div class="navbar navbar-default">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button>
+            <a href="#" onclick="return false;" class="navbar-brand">Artepolitica.com</a>
+          </div>
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav" id="navegante">
+              <li class="active">
+                <a href="#" section="portada">Portada</a>
+              </li>
+              <li>
+                <a href="#">Lecturas</a>
+              </li>
+              <li>
+                <a href="#">Comunidad</a>
+              </li>
+              <li>
+                <a href="#">Entradas</a>
+              </li>
+              <li>
+                <a href="#">Videos</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container" id="seccion">
+ <!--      <h1>La Secci&oacute;n</h1>
+      <div class="container">
+        el texto
+      </div> -->
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+    var currentSection;
+    var mainReq;
+    var catUrl;
+    var catPage =1;
+    	function loadSection (section) {
+        if(currentSection == section)
+        {
+          catPage+=1;
+        }
+        else
+          catPage = 1;
+        currentSection = section;
+
+    		var theUrl = "http://artepolitica.com/";
+  			switch(section)
+  			{
+  			
+  			case "Comunidad":
+  			  theUrl += 'comunidad/';
+  			  break;
+        case "Lecturas":
+          theUrl += 'lecturas/';
+          break;
+        case "Entradas":
+          theUrl += 'articulos/';
+          break;
+        case "Videos":
+          theUrl += 'videos/';
+          break;
+  			default:
+  			  
+  			}
+
+  			theUrl+= "page/"+catPage+"/?callback=?&json=1";
+        catUrl = theUrl;
+        if(catPage == 1) {
+        $("#seccion").html("");
+      }
+        $("#seccion").append($("<span class='label label-default' id='loaderid'>Cargando "+section+"...</span><img id='loadsectionimg'/>").attr("src","ajax-loader.gif"));
+
+        // cancelReq
+        
+  			mainReq = $.getJSON(theUrl,function  (data) {
+
+  				if(data.status == "ok")
+  				{
+            if(catPage == 1) {
+              $("#seccion").html("");
+            
+            $("#seccion").append($("<h1></h1>").text(section));
+            if(data.category)
+              $("#seccion").append($("<h6></h6>").html(data.category.description));
+
+            $("#seccion").append($("<hr/>"));
+
+            }
+            else
+            {
+                $("#loaderid").remove();
+                $("#loadsectionimg").remove();
+            }
+
+  					var def = $("<dl id='items'></dl>");
+            console.log(data);
+  					for (var i = 0; i < data.posts.length; i++) {
+  						item = data.posts[i];
+              titlel = $("<a></a>").attr("url",item.url).html(item.title).attr("href","#");
+              titlel.click(function  () {
+                $this = $(this);
+                loadArticle($this.attr("url"));
+                return false;
+              });
+
+  						itemcode = $("<dt></dt>").append(titlel);
+
+              itemdata = $("<span class='text-success small pull-right'></span>").text(" Por "+item.author.nickname + " en " + item.date);
+
+              itemcode.append(itemdata);
+
+              postbody = $("<p></p>");
+              postbody.append($(item.excerpt));
+              postbody.append($("<hr/>"));
+
+  						itemtext = $("<dd></dd>").append(postbody);
+
+  						def.append(itemcode);
+  						def.append(itemtext);
+
+  					};
+            if(catPage == 1) {
+              
+              $loadmore = $("<a id='id_loadmore' class='btn btn-success pull-right href='#'></a>").html("Cargar m&aacute;s").click(function  () {
+                loadSection(currentSection);
+                return false;
+              }) ;
+              $("#seccion").append($loadmore);
+            }
+            else
+              $loadmore = $("#id_loadmore");
+            def.insertBefore($loadmore);
+  					// $("#seccion").insert(def);
+
+
+
+
+  				}
+  			});
+    	}
+
+      function loadArticle (url) {
+          $("#seccion").html("");
+          $("#seccion").append($("<span class='label label-default'>Cargando...</span><img />").attr("src","ajax-loader.gif"));
+        mainReq = $.getJSON(url+"?callback=?&json=1",function  (data) {
+
+
+          if(data.status == "ok") {
+            console.log(data);
+          $("#seccion").html("");
+
+            $("#seccion").append($("<h1></h1>").text(currentSection));
+            $("#seccion").append($("<h3></h3>").html(data.post.title));
+            $("#seccion").append($("<hr/>"));
+            itemdata = $("<h6></h6>").text(" Por "+item.author.nickname + " en " + item.date);
+            $("#seccion").append(itemdata);
+
+            if(data.post.custom_fields && data.post.custom_fields.ap_lectura_url)
+            {
+            itemfuente = $("<h6></h6>").append($("<a class='btn btn-info btn-sm'></a>").text("Fuente").attr("href",data.post.custom_fields.ap_lectura_url));
+            $("#seccion").append(itemfuente);
+
+            }
+
+
+
+
+            divcontent = $("<div></div>");
+            divcontent.html(data.post.content);
+            $("#seccion").append(divcontent);
+          }
+
+
+        });
+      }
+
+    	$(document).ready(function  () {
+    		$("#navegante li a").click(function  () {
+          $this = $(this);
+          loadSection($this.text());
+          $("#navegante li").removeClass("active");
+          $this.parent().addClass("active");
+          return false;
+
+        })
+        loadSection("Portada");
+
+
+    	});
+
+    </script>
+  </body>
+</html>
