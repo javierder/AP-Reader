@@ -1,0 +1,9 @@
+AP Reader
+=========
+
+Bootstrap based wordpress JSON reader.
+
+This was built for the website artepolitica.com -in spanish-, included in a simple "WebView" android App ("Artepolitica Móvil").
+But the html & js code could be usefull for someone trying to play with the wordpress JSON plugin -http://wordpress.org/plugins/json-api/- and HTML.
+
+ 
